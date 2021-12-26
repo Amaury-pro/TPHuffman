@@ -8,38 +8,31 @@ class Node:
 
 # Sort following the buble sort
 def sort(proba):
-    # Go throw every cases from the last one to the second one
     for i in range(len(proba)-1, 0, -1):
-        for j in range(i):  # Go thrwo every cases from the first one to the one before proba[]
-            if proba[j] > proba[j+1]:  # Sort pairs
-                # exchange if needed
-                proba[j], proba[j+1] = proba[j+1], proba[j]
+        j = i
+        while proba[j] > proba[j-1]:
+            proba[j-1], proba[j] = proba[j], proba[j-1]
+            j += 1
+    return proba
 
-    for i in proba:
-        if min > proba[i]:
-            min = proba[i]
-    return proba, min
-
-
-"""
 def huffman_sort(proba):
     proba = sort(proba)
-    resultats = [proba]
+    resultats = [proba.copy()]
     tree = Node(p=1)
-    i = 0
+    print(proba)
     while len(proba) > 1:
-        i += 1
         proba = sort(proba)
         proba[-2] = proba[-1] + proba[-2]
         proba.pop()
-        resultats[i] = proba
-
-    for i in range(len(tableau), 0, -1):
-        tree.right = Node(p=tableau[i][-1])
-        tree.left = Node(p=tableau[i][-2])
-
+        print(proba)
+        resultats.append(proba.copy())
+    currentNode = tree
+    for i in range(len(resultats)-2, -1,-1):
+        currentNode.right = Node(p=resultats[i][-1])
+        currentNode.left = Node(p=resultats[i][-2])
+        currentNode = currentNode.right
     return tree
-"""
+
 
 
 def is_leaf(n):
