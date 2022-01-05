@@ -5,26 +5,14 @@ class Node:
         self.prob = p
         self.key = i
 
-
-# Sort following the buble sort
-def sort(proba):
-    for i in range(len(proba)-1, 0, -1):
-        j = i
-        while proba[j] > proba[j-1]:
-            proba[j-1], proba[j] = proba[j], proba[j-1]
-            j += 1
-    return proba
-
 def huffman_sort(proba):
-    proba = sort(proba)
+    proba = sorted(proba,reverse = True)
     resultats = [proba.copy()]
     tree = Node(p=1)
-    print(proba)
     while len(proba) > 1:
-        proba = sort(proba)
+        proba = sorted(proba,reverse = True)
         proba[-2] = proba[-1] + proba[-2]
         proba.pop()
-        print(proba)
         resultats.append(proba.copy())
     currentNode = tree
     for i in range(len(resultats)-2, -1,-1):
@@ -51,6 +39,15 @@ def get_cwd(tree):
     L = []
     create_liste_cwd(tree, L, tree, "")
     return L
+
+def huffman_code(proba):
+    tree = huffman_sort(proba)
+    cwd = get_cwd(tree)
+    somme = 0
+    for w in cwd:
+        somme += len(w)
+    
+    return (somme/len(cwd),cwd)
 
 def create_liste_cwd(tree, L, node, s):
     if node == None:  # cas d'arbre null
@@ -104,3 +101,74 @@ print(L)
 tree = huffman_tree2(L)
 L = get_cwd(tree)
 print(L)
+
+def cwd_detect(tree,seq):
+    i = 0
+    for k in seq:
+        if k == 0:
+            if tree.left:
+                tree = tree.left
+                i = i + 1
+            else:
+                return i
+        elif k == 1:
+            if tree.right:
+                tree = tree.right
+                i = i + 1
+            else:
+                return i
+    return i
+
+def get_proba_and_symb(seq):
+    dict = {}
+    for n in seq:
+        keys = dict.keys()
+        if n in keys:
+            dict[n] += 1
+        else:
+            dict[n] = 1
+    sorted_dict = {}
+    sorted_keys = sorted(dict, key=dict.get, reverse=True)
+    
+    for w in sorted_keys:
+        sorted_dict[w] = dict[w]
+    proba = []
+    symb = []
+    for k,v in sorted_dict.items():
+        proba.append(v/len(seq))
+        symb.append(k)
+    return (proba,symb)
+
+def get_key_char(symb, char):
+    i = 0
+    for k in symb:
+        if k == char:
+            return i
+        i += 1
+
+def get_seqencoded_from_seq(seq, cwd, symb):
+    encoded_seq = ""
+    for c in seq:
+        i = get_key_char(symb,c)
+        encoded_seq += str(cwd[i])
+    return encoded_seq
+    
+
+def huffman_decode(seq, symb, cwd):
+    i = 0
+    tree = huffman_tree2(cwd)
+    return 0
+    while i != len(seq):
+        newi = cwd_detect(tree, seq)
+        lettre = seq[i:newi]
+        print(lettre)
+        i = newi
+
+def test_hufffman_algo(seq):
+    proba, symb = get_proba_and_symb(seq)
+    cwd = huffman_code(proba)[1]
+    print("Le message ' "+seq+" 'une fois encodé donne : \n")
+    encoded_message = get_seqencoded_from_seq(seq,cwd,symb)
+    print(encoded_message)
+    print("On décode maintenant son contenu et on obtient :")
+
