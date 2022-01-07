@@ -1,3 +1,8 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import math as m
+import PIL as pil
+
 class Node:
     def __init__(self, l=None, r=None, i=0, p=0):
         self.left = l
@@ -82,10 +87,12 @@ def create_tree(ListCwd, tree):
             if c == '0': # cas on va à gauche
                 if node.left == None: # cas le noeud suivant existe pas
                     node.left = Node()
+                    node.left.key = 0
                 node = node.left
             elif c == '1': # cas on va à droite
                 if node.right == None: # cas le noeud suivant existe déjà
                     node.right = Node()
+                    node.right.key = 1
                 node = node.right
 
 
@@ -103,21 +110,34 @@ L = get_cwd(tree)
 print(L)
 
 def cwd_detect(tree,seq):
+    list_dec = []
     i = 0
+    j = 0
+    racine = tree
+    compteur = 0
     for k in seq:
-        if k == 0:
-            if tree.left:
+        k = int(k)
+        
+        if (k == 0):
+            if (tree.left != None):
+                i = i+1
                 tree = tree.left
-                i = i + 1
             else:
-                return i
-        elif k == 1:
-            if tree.right:
+                tree = racine
+                list_dec.append(seq[j:i])
+                j = i
+                i = i+1
+        elif (k == 1):
+            if(tree.right != None):
+                i = i+1
                 tree = tree.right
-                i = i + 1
             else:
-                return i
-    return i
+                tree = racine
+                list_dec.append(seq[j:i])
+                j = i
+                i = i+1      
+        compteur += 1
+    return list_dec
 
 def get_proba_and_symb(seq):
     dict = {}
@@ -152,17 +172,18 @@ def get_seqencoded_from_seq(seq, cwd, symb):
         i = get_key_char(symb,c)
         encoded_seq += str(cwd[i])
     return encoded_seq
-    
 
 def huffman_decode(seq, symb, cwd):
     i = 0
     tree = huffman_tree2(cwd)
-    return 0
-    while i != len(seq):
-        newi = cwd_detect(tree, seq)
-        lettre = seq[i:newi]
-        print(lettre)
-        i = newi
+    
+    list_i = cwd_detect(tree, seq)
+    while i < len(list_i):
+        c = symb[get_key_char(seq,list_i[i])]
+        print(c)
+        i = i+1
+        return 0
+
 
 def test_hufffman_algo(seq):
     proba, symb = get_proba_and_symb(seq)
@@ -170,5 +191,16 @@ def test_hufffman_algo(seq):
     print("Le message ' "+seq+" 'une fois encodé donne : \n")
     encoded_message = get_seqencoded_from_seq(seq,cwd,symb)
     print(encoded_message)
-    print("On décode maintenant son contenu et on obtient :")
+    print(cwd)
+    print(symb)
 
+test_hufffman_algo("Bonjour")
+
+
+def calc_entropie(histo):
+    s=0
+    n = len(histo)
+    for i in range(0,n):
+        if(histo[i] > 0):
+            s += histo[i]*m.log10(histo[i])
+    return -s
